@@ -1,0 +1,23 @@
+{
+  "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg/master/scripts/vcpkg.schema.json",
+  "name": "saving-on-horse",
+  "version-string": "1.0.0",
+  "port-version": 0,
+  "description": "A smol SKSE plugin that fixes loading games saved on horse that actually works.",
+  "homepage": "https://www.skyrimng.com",
+  "license": "Apache-2.0",
+  "features": {
+    "plugin": {
+      "description": "Build the SKSE plugin.",
+      "dependencies": [
+        "commonlibsse-ng",
+        "directxmath",
+        "directxtk",
+        "openvr"
+      ]
+    }
+  },
+  "default-features": [
+    "plugin"
+  ]
+}
