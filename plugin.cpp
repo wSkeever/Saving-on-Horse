@@ -4,6 +4,7 @@ using namespace RE;
 
 namespace SavingOnHorse {
     TESObjectCELL* g_QASmokeCell = nullptr;
+
     void OnGameLoaded() {
         const auto playerRef = PlayerCharacter::GetSingleton();
         if (!playerRef) {
