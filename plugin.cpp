@@ -36,6 +36,13 @@ namespace SavingOnHorse {
     }
 
     void HandleFollowers() {
+        const auto playerRef = PlayerCharacter::GetSingleton();
+        if (!playerRef) {
+            return;
+        }
+        if (!playerRef->IsOnMount()) {
+            return;
+        }
         const auto processLists = ProcessLists::GetSingleton();
         if (!processLists) {
             return;
