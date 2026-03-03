@@ -1,11 +1,12 @@
 #include "RE/Skyrim.h"
 #include "SKSE/SKSE.h"
 using namespace RE;
+using namespace SKSE;
 
 namespace SavingOnHorse {
     TESObjectCELL* g_QASmokeCell = nullptr;
 
-    void OnGameLoaded() {
+    void HandlePlayer() {
         const auto playerRef = PlayerCharacter::GetSingleton();
         if (!playerRef) {
             return;
@@ -13,7 +14,7 @@ namespace SavingOnHorse {
         if (!playerRef->IsOnMount()) {
             return;
         }
-        RE::NiPointer<RE::Actor> mountPtr;
+        NiPointer<Actor> mountPtr;
         if (!playerRef->GetMount(mountPtr)) {
             return;
         }
@@ -22,9 +23,9 @@ namespace SavingOnHorse {
             return;
         }
         if (!g_QASmokeCell) {
-            auto* dataHandler = RE::TESDataHandler::GetSingleton();
+            auto* dataHandler = TESDataHandler::GetSingleton();
             if (dataHandler) {
-                g_QASmokeCell = dataHandler->LookupForm<RE::TESObjectCELL>(0x32AE7, "Skyrim.esm");
+                g_QASmokeCell = dataHandler->LookupForm<TESObjectCELL>(0x32AE7, "Skyrim.esm");
             }
         }
         if (!g_QASmokeCell) {
@@ -34,10 +35,36 @@ namespace SavingOnHorse {
         playerRef->MoveTo(mountRef);
     }
 
-    SKSEPluginLoad(const SKSE::LoadInterface* skse) {
-        SKSE::Init(skse);
-        SKSE::GetMessagingInterface()->RegisterListener([](SKSE::MessagingInterface::Message* message) {
-            if (message->type == SKSE::MessagingInterface::kPostLoadGame) {
+    void HandleFollowers() {
+        const auto processLists = ProcessLists::GetSingleton();
+        if (!processLists) {
+            return;
+        }
+        const auto highActorHandles = processLists->highActorHandles;
+        for (auto& actorHandle : highActorHandles) {
+            if (!actorHandle) {
+                continue;
+            }
+            const auto actorPtr = actorHandle.get();
+            if (!actorPtr) {
+                continue;
+            }
+            if (!actorPtr->IsOnMount()) {
+                continue;
+            }
+            actorPtr->PutActorOnMountQuick();
+        }
+    }
+
+    void OnGameLoaded() {
+        HandleFollowers();
+        HandlePlayer();
+    }
+
+    SKSEPluginLoad(const LoadInterface* skse) {
+        Init(skse);
+        GetMessagingInterface()->RegisterListener([](MessagingInterface::Message* message) {
+            if (message->type == MessagingInterface::kPostLoadGame) {
                 OnGameLoaded();
             }
         });
